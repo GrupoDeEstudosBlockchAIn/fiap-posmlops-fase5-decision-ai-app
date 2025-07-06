@@ -49,4 +49,5 @@ jobs:
           cd space-prod
           git add .
           git commit -m "Deploy produção via GitHub Actions" || echo "Nada para commitar"
-          git push https://${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_PROD} HEAD
+          git push https://huggingface_hub_token:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_PROD} HEAD
+
