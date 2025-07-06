@@ -8,7 +8,7 @@ on:
       - master
 
 env:
-  HF_SPACE_PROD: seu-usuario/decision-ai-prod
+  HF_SPACE_PROD: cittamap/decision-ai-prod
   HF_TOKEN: ${{ secrets.HF_TOKEN }}
 
 jobs:
@@ -44,9 +44,9 @@ jobs:
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
           cd frontend
-          git clone https://huggingface.co/spaces/${{ env.HF_SPACE_PROD }} space-prod
+          git clone https://huggingface.co/spaces/${HF_SPACE_PROD} space-prod
           cp app.py requirements.txt space-prod/
           cd space-prod
           git add .
-          git commit -m "Deploy produção via GitHub Actions"
-          git push https://user:${HF_TOKEN}@huggingface.co/spaces/${{ env.HF_SPACE_PROD }} HEAD
+          git commit -m "Deploy produção via GitHub Actions" || echo "Nada para commitar"
+          git push https://${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_PROD} HEAD
