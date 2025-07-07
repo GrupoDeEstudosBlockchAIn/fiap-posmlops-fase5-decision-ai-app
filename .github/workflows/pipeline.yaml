@@ -14,7 +14,7 @@ env:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    name: Validação de Código (Opcional)
+    name: Validação de Código
     if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
     steps:
       - name: 🔄 Checkout código
@@ -29,26 +29,28 @@ jobs:
         run: |
           cd frontend
           pip install -r requirements.txt
-          python -m compileall app.py
+          python -m compileall src/streamlit_app.py
 
   deploy-prod:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: 🚀 Deploy para Hugging Face (Produção)
-    if: github.ref == 'refs/heads/master'
     steps:
       - name: 🔄 Checkout código
         uses: actions/checkout@v3
 
-      - name: 📤 Deploy para o Hugging Face Space
+      - name: 📤 Deploy via Git para Hugging Face Space com Dockerfile
         run: |
           git config --global user.email "actions@github.com"
           git config --global user.name "GitHub Actions"
-          cd frontend
-          git clone https://${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_PROD} ../space-prod
-          cp app.py requirements.txt ../space-prod/
-          cd ../space-prod
-          git add .
-          git commit -m "Deploy produção via GitHub Actions" || echo "Nada para commitar"
-          git push https://huggingface_hub_token:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_PROD} HEAD
 
+          cd frontend
+          git clone https://${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_PROD} space-prod
+
+          cp -r Dockerfile requirements.txt src space-prod/
+          cd space-prod
+
+          git add .
+          git commit -m "🚀 Deploy automático via GitHub Actions"
+          git push https://huggingface_hub_token:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_PROD} HEAD
 

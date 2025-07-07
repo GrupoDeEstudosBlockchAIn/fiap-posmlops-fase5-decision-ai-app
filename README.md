@@ -47,15 +47,18 @@ fiap-posmlops-fase5-datathon-decision
 │       └── pipeline.yaml
 │
 ├── frontend/
-├── .streamlit/
-│   └── config.toml
+│   └── .streamlit/
+│   │    └── config.toml
 │   │
-│   ├── app.py
+│   └── src/
+│   │    └── streamlit_app.py
+│   │
+│   ├── Dockerfile
 │   └── requirements.txt
 │
-├── README.md
 ├── .gitignore
-└── Doc_Recrutamento_Decision.pdf
+├── Doc_Recrutamento_Decision.pdf
+└── README.md
 ```
 
 ---
@@ -104,5 +107,3 @@ Este projeto é parte de um desafio acadêmico da FIAP e segue os termos educaci
 ## ✉️ Contato
 Desenvolvido por Alexandro de Paula Barros
 Para dúvidas técnicas, abra uma issue ou entre em contato.
-
-
