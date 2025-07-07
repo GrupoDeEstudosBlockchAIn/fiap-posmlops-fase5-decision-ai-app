@@ -14,7 +14,7 @@ env:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    name: Validação de Código (Opcional)
+    name: Validação de Código
     if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
     steps:
       - name: 🔄 Checkout código
@@ -32,6 +32,7 @@ jobs:
           python -m compileall src/streamlit_app.py
 
   deploy-prod:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     name: 🚀 Deploy para Hugging Face (Produção)
     steps:
@@ -51,4 +52,5 @@ jobs:
 
           git add .
           git commit -m "🚀 Deploy automático via GitHub Actions"
-          git push https://${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_PROD} HEAD
+          git push https://huggingface_hub_token:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_PROD} HEAD
+
