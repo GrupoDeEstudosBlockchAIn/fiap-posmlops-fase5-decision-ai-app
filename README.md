@@ -107,5 +107,3 @@ Este projeto é parte de um desafio acadêmico da FIAP e segue os termos educaci
 ## ✉️ Contato
 Desenvolvido por Alexandro de Paula Barros
 Para dúvidas técnicas, abra uma issue ou entre em contato.
-
-
