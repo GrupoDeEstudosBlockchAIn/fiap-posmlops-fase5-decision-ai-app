@@ -1,0 +1,35 @@
+{
+  "id_vaga": "5185",
+  "candidatos": [
+    {
+      "nome": "Carlos Mendes",
+      "cv": "Consultor SAP BASIS com experiência em ambientes AWS e Oracle. Responsável por liderar suporte técnico e implantações. Inglês fluente.",
+      "nivel_ingles": "Fluente",
+      "area_atuacao": "TI - Sistemas e Ferramentas-"
+    },
+    {
+      "nome": "Rodrigo Lima",
+      "cv": "Especialista em operações de infraestrutura com foco em gestão de fornecedores e controle de SLAs. Experiência com SQL e gestão de custos.",
+      "nivel_ingles": "Avançado",
+      "area_atuacao": "TI - Sistemas e Ferramentas-"
+    },
+    {
+      "nome": "João da Silva",
+      "cv": "Profissional com ampla experiência em gestão de operações de TI. Liderou equipes em projetos de Cloud, com expertise em AWS, SAP BASIS, banco de dados SQL e Oracle. Fluente em inglês. Forte habilidade em gerenciamento de SLA e relacionamento com clientes.",
+      "nivel_ingles": "Avançado",
+      "area_atuacao": "TI - Sistemas e Ferramentas-"
+    },
+    {
+      "nome": "Maria Oliveira",
+      "cv": "Engenheira de software com foco em Java e sistemas bancários. Experiência em liderança técnica e projetos internacionais. Espanhol avançado.",
+      "nivel_ingles": "Básico",
+      "area_atuacao": "TI - Desenvolvimento de Software"
+    },
+    {
+      "nome": "Ana Beatriz",
+      "cv": "Analista de RH com ênfase em recrutamento tech. Conhecimento básico em sistemas de ERP.",
+      "nivel_ingles": "Intermediário",
+      "area_atuacao": "Recursos Humanos"
+    }
+  ]
+}

@@ -1,2 +1,4 @@
 requests
 streamlit
+python-docx
+PyPDF2
