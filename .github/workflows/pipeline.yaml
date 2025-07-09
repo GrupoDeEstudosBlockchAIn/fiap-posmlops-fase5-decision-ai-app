@@ -1,4 +1,4 @@
-name: Deploy Streamlit App to Hugging Face (Produção)
+name: Validação Streamlit App (Pré-deploy)
 
 on:
   push:
@@ -7,17 +7,13 @@ on:
       - staging
       - master
 
-env:
-  HF_SPACE_PROD: cittamap/decision-ai-app
-  HF_TOKEN: ${{ secrets.HF_TOKEN }}
-
 jobs:
   validate:
+    name: 🧪 Validar Streamlit App
     runs-on: ubuntu-latest
-    name: Validação de Código
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/staging'
+
     steps:
-      - name: 🔄 Checkout código
+      - name: 🔄 Checkout do código
         uses: actions/checkout@v3
 
       - name: 🐍 Setup Python
@@ -25,29 +21,13 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: 📦 Instalar dependências e validar app
+      - name: 📦 Instalar dependências
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
-          python -m compileall src/streamlit_app.py
 
-  deploy-prod:
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    name: 🚀 Deploy para Hugging Face (Produção)
-    steps:
-      - name: 🔄 Checkout código
-        uses: actions/checkout@v3
+      - name: ✅ Verificar compilação do app
+        run: python -m compileall app.py
 
-      - name: 📤 Deploy via Git para Hugging Face Space com Dockerfile
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "GitHub Actions"
-
-          git clone https://${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_PROD} space-prod
-
-          cp -r Dockerfile requirements.txt src .streamlit space-prod/
-          cd space-prod
-
-          git add .
-          git commit --allow-empty -m "🚀 Deploy automático via GitHub Actions"
-          git push https://huggingface_hub_token:${HF_TOKEN}@huggingface.co/spaces/${HF_SPACE_PROD} HEAD
+      - name: ℹ️ Verificar versão do Streamlit
+        run: streamlit --version

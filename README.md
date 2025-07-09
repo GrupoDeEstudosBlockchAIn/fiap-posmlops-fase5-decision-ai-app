@@ -49,14 +49,12 @@ fiap-posmlops-fase5-datathon-decision
 ├── .streamlit/
 │   └── config.toml
 │   
-├──src/
-│  └── streamlit_app.py
-│   
-├── Dockerfile
+├── app.py
+│     
 ├── requirements.txt
 │
 ├── .gitignore
-├── Doc_Recrutamento_Decision.pdf
+├── Documentação_Decision_App.pdf
 └── README.md
 ```
 
