@@ -15,7 +15,7 @@ COPY --chown=user requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copiar o app e a pasta de configuração do Streamlit
-COPY --chown=user src/ ./src/
+COPY --chown=user ./src/ ./src/
 COPY --chown=user .streamlit/ .streamlit/
 
 # Comando para executar o Streamlit
