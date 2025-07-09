@@ -2,10 +2,6 @@
 headless = true
 enableXsrfProtection = false
 enableCORS = false
-port = 7860
-address = "0.0.0.0"
 
 [browser]
-serverAddress = "localhost"
 gatherUsageStats = false
-serverPort = 7860
