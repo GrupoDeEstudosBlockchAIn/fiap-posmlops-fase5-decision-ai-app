@@ -6,12 +6,6 @@ API_URL = "https://fiap-posmlops-fase5-datathon-decision-production.up.railway.a
 st.set_page_config(page_title="Decision AI - Compatibilidade de Candidatos", layout="wide")
 st.title("Decision AI - Análise de Compatibilidade de Candidatos")
 
-with st.spinner("Inicializando aplicação..."):
-     st.markdown("### 👋 Bem-vindo ao Decision AI!")
-
-# 🔧 Conteúdo inicial forçado para Streamlit renderizar imediatamente
-st.markdown("### 👋 Preencha os dados acima para analisar compatibilidade entre candidatos e a vaga!")
-
 
 # Input da vaga
 id_vaga = st.text_input("ID da Vaga", placeholder="Ex: 5185")
