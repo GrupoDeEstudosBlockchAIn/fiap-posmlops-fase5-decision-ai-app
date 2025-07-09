@@ -19,4 +19,4 @@ COPY --chown=user ./src/ ./src/
 COPY --chown=user .streamlit/ .streamlit/
 
 # Comando para executar o Streamlit
-CMD ["streamlit", "run", "src/streamlit_app.py", "--server.port=7860", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "app.py", "--server.port=7860", "--server.address=0.0.0.0"]
