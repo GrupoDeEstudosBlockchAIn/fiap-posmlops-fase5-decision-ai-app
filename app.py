@@ -5,7 +5,7 @@ import json
 from src.utils.resume_parser import (
     extract_text_from_docx,
     extract_text_from_pdf,
-    preencher_campos_automaticamente
+    auto_parse_resume
 )
 
 API_URL = "https://fiap-posmlops-fase5-datathon-decision-production.up.railway.app"
@@ -53,7 +53,7 @@ with st.sidebar:
                     else:
                         continue
 
-                    nome, nivel, area = preencher_campos_automaticamente(texto_cv)
+                    nome, nivel, area = auto_parse_resume(texto_cv)
 
                     st.session_state.candidatos_extraidos.append({
                         "nome": nome,
@@ -64,6 +64,7 @@ with st.sidebar:
                 except Exception as e:
                     st.error(f"Erro ao processar {cv_file.name}: {str(e)}")
             st.success("✅ Currículos processados automaticamente!")
+
 
 # ---------------- COLUNA 1: FORMULÁRIO ----------------
 with col1:
