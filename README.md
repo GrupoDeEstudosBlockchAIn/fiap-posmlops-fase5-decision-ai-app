@@ -48,7 +48,11 @@ fiap-posmlops-fase5-datathon-decision
 │
 ├── .streamlit/
 │   └── config.toml
-│   
+│
+├── src/
+│   └── utils/
+│       └── resume_parser.py
+│
 ├── app.py
 │     
 ├── requirements.txt
@@ -73,10 +77,17 @@ pip install -r requirements.txt
 
 ```
 
-## Executar o app
+## Executar o app (local)
 ```bash
 
 streamlit run app.py
+
+```
+
+## Executar o app (produção)
+```bash
+
+https://fiap-posmlops-fase5-decision-ai-app-53sj9eonvioxutlfmkqgnh.streamlit.app/
 
 ```
 
