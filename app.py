@@ -1,9 +1,12 @@
 import streamlit as st
 import requests
 import json
-from io import BytesIO
-from docx import Document
-from PyPDF2 import PdfReader
+
+from src.utils.resume_parser import (
+    extract_text_from_docx,
+    extract_text_from_pdf,
+    preencher_campos_automaticamente
+)
 
 API_URL = "https://fiap-posmlops-fase5-datathon-decision-production.up.railway.app"
 st.set_page_config(page_title="Decision AI - Compatibilidade de Candidatos", layout="wide")
@@ -16,18 +19,6 @@ if "json_data" not in st.session_state:
 
 if "candidatos_extraidos" not in st.session_state:
     st.session_state.candidatos_extraidos = []
-
-# ---------------- FUNÇÕES AUXILIARES ----------------
-def extrair_texto_docx(uploaded_file):
-    doc = Document(uploaded_file)
-    return "\n".join([p.text for p in doc.paragraphs])
-
-def extrair_texto_pdf(uploaded_file):
-    reader = PdfReader(uploaded_file)
-    texto = ""
-    for page in reader.pages:
-        texto += page.extract_text() or ""
-    return texto
 
 # ---------------- SIDEBAR ----------------
 with st.sidebar:
@@ -45,31 +36,34 @@ with st.sidebar:
 
     st.markdown("---")
 
-    # Upload de .pdf ou .docx
-    st.subheader("📄 Currículos Individuais")
-    uploaded_cv = st.file_uploader("Currículo (.pdf ou .docx)", type=["pdf", "docx"])
-    nome_cv = st.text_input("Nome do Candidato")
-    nivel_cv = st.selectbox("Nível de Inglês", ["Básico", "Intermediário", "Avançado", "Fluente"])
-    area_cv = st.text_input("Área de Atuação")
+    # Upload múltiplos currículos
+    st.subheader("📄 Currículos (.pdf ou .docx)")
+    uploaded_cvs = st.file_uploader("Selecionar arquivos", type=["pdf", "docx"], accept_multiple_files=True)
 
-    if st.button("📥 Adicionar ao Formulário"):
-        if not uploaded_cv or not nome_cv or not area_cv:
-            st.warning("Preencha todos os campos e anexe o currículo.")
+    if st.button("📥 Processar Currículos Automaticamente"):
+        if not uploaded_cvs:
+            st.warning("Anexe pelo menos um currículo.")
         else:
-            try:
-                if uploaded_cv.name.endswith(".pdf"):
-                    texto_cv = extrair_texto_pdf(uploaded_cv)
-                else:
-                    texto_cv = extrair_texto_docx(uploaded_cv)
-                st.session_state.candidatos_extraidos.append({
-                    "nome": nome_cv,
-                    "cv": texto_cv,
-                    "nivel_ingles": nivel_cv,
-                    "area_atuacao": area_cv
-                })
-                st.success("✅ Candidato adicionado!")
-            except Exception as e:
-                st.error(f"Erro ao processar currículo: {str(e)}")
+            for cv_file in uploaded_cvs:
+                try:
+                    if cv_file.name.endswith(".pdf"):
+                        texto_cv = extract_text_from_pdf(cv_file)
+                    elif cv_file.name.endswith(".docx"):
+                        texto_cv = extract_text_from_docx(cv_file)
+                    else:
+                        continue
+
+                    nome, nivel, area = preencher_campos_automaticamente(texto_cv)
+
+                    st.session_state.candidatos_extraidos.append({
+                        "nome": nome,
+                        "cv": texto_cv,
+                        "nivel_ingles": nivel,
+                        "area_atuacao": area
+                    })
+                except Exception as e:
+                    st.error(f"Erro ao processar {cv_file.name}: {str(e)}")
+            st.success("✅ Currículos processados automaticamente!")
 
 # ---------------- COLUNA 1: FORMULÁRIO ----------------
 with col1:
@@ -82,7 +76,8 @@ with col1:
     candidatos_json = st.session_state.json_data.get("candidatos", []) if st.session_state.json_data else []
     candidatos_gerais = candidatos_json + st.session_state.candidatos_extraidos
 
-    num_candidatos = st.slider("👤 Quantidade de Candidatos", 1, 10, len(candidatos_gerais) or 1)
+    total_candidatos = len(candidatos_gerais)
+    num_candidatos = st.slider("👤 Quantidade de Candidatos", 1, 10, total_candidatos if total_candidatos > 0 else 1)
 
     candidatos_container = st.container()
     candidatos = []
@@ -96,7 +91,9 @@ with col1:
                 nivel_ingles = st.selectbox(
                     f"Nível de Inglês {i+1}",
                     ["Básico", "Intermediário", "Avançado", "Fluente"],
-                    index=["Básico", "Intermediário", "Avançado", "Fluente"].index(candidato_info.get("nivel_ingles", "Básico")),
+                    index=["Básico", "Intermediário", "Avançado", "Fluente"].index(
+                        candidato_info.get("nivel_ingles", "Básico")
+                    ),
                     key=f"nivel_{i}"
                 )
                 area_atuacao = st.text_input(f"Área de Atuação {i+1}", key=f"area_{i}", value=candidato_info.get("area_atuacao", ""))

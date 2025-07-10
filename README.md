@@ -48,7 +48,11 @@ fiap-posmlops-fase5-datathon-decision
 │
 ├── .streamlit/
 │   └── config.toml
-│   
+│
+├── src/
+│   └── utils/
+│       └── resume_parser.py
+│
 ├── app.py
 │     
 ├── requirements.txt
