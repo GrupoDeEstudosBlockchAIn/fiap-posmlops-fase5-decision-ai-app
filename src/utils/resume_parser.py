@@ -23,19 +23,22 @@ def auto_parse_resume(texto):
     linhas = texto.strip().splitlines()
     nome = next((linha.strip() for linha in linhas if re.match(r'^[A-Za-zÀ-ÿ\s\-]{5,}$', linha.strip())), "Nome não identificado")
 
-    # Nível de inglês
-    if "fluente" in texto_lower:
-        nivel = "Fluente"
-    elif "avançado" in texto_lower:
-        nivel = "Avançado"
-    elif "intermediário" in texto_lower:
-        nivel = "Intermediário"
-    elif "básico" in texto_lower:
-        nivel = "Básico"
-    else:
-        nivel = "Intermediário"
+    # ------------ Nível de Inglês com verificação contextual (regex) ------------
+    nivel = ""  # padrão vazio
+    padroes_ingles = [
+        r"ingl[eê]s\s*[-:]?\s*(fluente)",          # Inglês fluente
+        r"ingl[eê]s\s*[-:]?\s*(avançado)",         # Inglês avançado
+        r"ingl[eê]s\s*[-:]?\s*(intermedi[áa]rio)", # Inglês intermediário
+        r"ingl[eê]s\s*[-:]?\s*(b[áa]sico)",        # Inglês básico
+    ]
 
-    # Área de atuação
+    for padrao in padroes_ingles:
+        match = re.search(padrao, texto_lower)
+        if match:
+            nivel = match.group(1).capitalize()  # ex: "Fluente", "Avançado"
+            break
+
+    # ------------ Área de atuação ------------
     if "recrutamento" in texto_lower or "rh" in texto_lower:
         area = "Recursos Humanos"
     elif any(p in texto_lower for p in ["desenvolvimento", "java", "python", "c#", "front-end", "back-end"]):
@@ -46,3 +49,5 @@ def auto_parse_resume(texto):
         area = "TI - Outros"
 
     return nome, nivel, area
+
+
