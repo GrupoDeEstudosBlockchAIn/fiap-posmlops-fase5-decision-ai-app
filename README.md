@@ -51,7 +51,8 @@ fiap-posmlops-fase5-datathon-decision
 │
 ├── src/
 │   └── utils/
-│       └── resume_parser.py
+│       ├── resume_parser.py
+│       └── vagas_resumida.json
 │
 ├── app.py
 │     
