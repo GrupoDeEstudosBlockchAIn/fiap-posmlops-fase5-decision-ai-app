@@ -64,6 +64,17 @@ with st.sidebar:
             st.error(f"Erro ao ler JSON: {str(e)}")
 
 
+    st.markdown("---")
+    st.markdown("""
+        <div style='text-align: center; font-size: 14px; color: #666; margin-top: 30px;'>
+            <strong>2025 - Alexandro de Paula Barros</strong><br>
+            Todos os direitos reservados<br>
+            <em>Curso: Engenharia de Machine Learning</em><br>
+            <strong>FIAP: Pós-Graduação</strong>
+        </div>
+    """, unsafe_allow_html=True)
+         
+
 
 # ---------------- COLUNA 1: FORMULÁRIO ----------------
 with col1:
