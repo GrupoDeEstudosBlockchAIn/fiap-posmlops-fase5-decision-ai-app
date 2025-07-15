@@ -130,66 +130,139 @@ with col1:
 
     enviar = st.button("🚀 Obter Resultado")
 
+
 # ---------------- COLUNA 2: RESULTADO ----------------
 with col2:
     st.header("📊 Resultado")
+    resultado_container = st.container()
 
-    if enviar:
+    # ✅ Inicializar variáveis de sessão
+    if "carregando" not in st.session_state:
+        st.session_state.carregando = False
+    if "executou_requisicao" not in st.session_state:
+        st.session_state.executou_requisicao = False
+
+    if enviar and not st.session_state.carregando and not st.session_state.executou_requisicao:
         if not id_vaga.strip():
-            st.error("❗ Por favor, insira o ID da vaga.")
+            with resultado_container:
+                resultado_container.error("❗ Por favor, insira o ID da vaga.")
+            st.session_state.carregando = False
         elif any(not c["nome"] or not c["cv"] or not c["area_atuacao"] for c in candidatos):
-            st.error("❗ Todos os campos dos candidatos devem ser preenchidos.")
+            with resultado_container:
+                resultado_container.error("❗ Todos os campos dos candidatos devem ser preenchidos.")
+            st.session_state.carregando = False
         else:
-            try:
-                if num_candidatos == 1:
-                    payload = {"id_vaga": id_vaga, **candidatos[0]}
-                    response = requests.post(f"{API_URL}/match", json=payload)
-                    result = response.json()
+            st.session_state.carregando = True
+            st.rerun()
+
+    elif st.session_state.carregando and not st.session_state.executou_requisicao:
+        with resultado_container:
+            st.markdown("### ⏳ Analisando Candidatos...")
+            st.warning("Estamos avaliando os perfis com base na vaga selecionada. Isso pode levar alguns segundos.")
+            st.image("https://media.giphy.com/media/iD0Am2d5XrMoGvLtLd/giphy.gif", width=300)
+
+        # Marcar que já carregou, e fazer a requisição real
+        st.session_state.executou_requisicao = True
+        st.rerun()
+
+    elif st.session_state.carregando and st.session_state.executou_requisicao:
+        try:
+            if num_candidatos == 1:
+                payload = {"id_vaga": id_vaga, **candidatos[0]}
+                response = requests.post(f"{API_URL}/match", json=payload)
+                result = response.json()
+
+                # Substituir o valor do perfil para exibição única
+                perfil_mapeado = {
+                    "Match Técnico": "Pronto para Entrevista",
+                    "Compatível": "Perfil Promissor",
+                    "Não Compatível": "Não Recomendado"
+                }
+                perfil = perfil_mapeado.get(result.get("perfil_recomendado", ""), "Não Recomendado")
+
+                with resultado_container:
+                    st.session_state.carregando = False
+                    st.session_state.executou_requisicao = False
                     st.subheader("🔍 Resultado do Candidato")
-                    st.metric(label="Perfil", value=result.get("perfil_recomendado"))
+                    st.metric(label="Perfil", value=perfil)
                     st.write(f"**Score:** {round(result.get('score', 0), 2)}")
                     st.write(f"**Match:** {'✅ Sim' if result.get('match') else '❌ Não'}")
 
-                else:
-                    payload = {"id_vaga": id_vaga, "candidatos": candidatos}
-                    response = requests.post(f"{API_URL}/rank", json=payload)
-                    results = response.json()
+            else:
+                payload = {"id_vaga": id_vaga, "candidatos": candidatos}
+                response = requests.post(f"{API_URL}/rank", json=payload)
+                results = response.json()
 
+                # Substituir os valores da coluna "perfil_recomendado"
+                for r in results:
+                    if r["perfil_recomendado"] == "Match Técnico":
+                        r["perfil_recomendado"] = "Pronto para Entrevista"
+                    elif r["perfil_recomendado"] == "Compatível":
+                        r["perfil_recomendado"] = "Perfil Promissor"
+                    elif r["perfil_recomendado"] == "Não Compatível":
+                        r["perfil_recomendado"] = "Não Recomendado"
+
+                with resultado_container:
+                    st.session_state.carregando = False
+                    st.session_state.executou_requisicao = False
                     st.subheader("🏆 Ranking de Candidatos")
 
-                    # Monta DataFrame e formata
+                    st.markdown("""
+                        <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 15px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 15px; height: 15px; background-color: #32CD32; border-radius: 50%;"></div>
+                                <span style="font-size: 15px;">Pronto para Entrevista</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 15px; height: 15px; background-color: #FFD700; border-radius: 50%;"></div>
+                                <span style="font-size: 15px;">Perfil Promissor</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 15px; height: 15px; background-color: #FF6347; border-radius: 50%;"></div>
+                                <span style="font-size: 15px;">Não Recomendado</span>
+                            </div>
+                        </div>
+                    """, unsafe_allow_html=True)
+
                     df = pd.DataFrame(results)
                     df["Score"] = df["score"].map(lambda x: f"{x:.2f}".replace('.', ','))
                     df = df.drop(columns=["score"])
                     df = df[["nome", "perfil_recomendado", "Score"]]
-                    df.index = df.index + 1  # Começar do 1
-                    df.rename(columns={
-                        "nome": "Nome",
-                        "perfil_recomendado": "Perfil"
-                    }, inplace=True)
+                    df.index = df.index + 1
+                    df.rename(columns={"nome": "Nome", "perfil_recomendado": "Perfil"}, inplace=True)
 
-                    GREEN_COLOR = "#32CD32"  # ou "#00cc44"
+                    def highlight_profile(row):
+                        perfil = row["Perfil"]
+                        if perfil == "Pronto para Entrevista":
+                            color = "#32CD32"
+                        elif perfil == "Perfil Promissor":
+                            color = "#FFD700"
+                        else:
+                            color = "#FF6347"
+                        return [f"font-weight: bold; color: {color}; font-size: 17px;"] * len(row)
 
-                    def highlight_compatibles(row):
-                        if row["Perfil"] == "Compatível":
-                            return [f"font-weight: bold; color: {GREEN_COLOR}; font-size: 17px;"] * len(row)
-                        return ["font-size: 17px;"] * len(row)  # todos com tamanho de fonte maior
-
-                    styled_df = df.style.apply(highlight_compatibles, axis=1)
-
-                    # Ajuste de tamanho da tabela
+                    styled_df = df.style.apply(highlight_profile, axis=1)
                     styled_df = styled_df.set_table_styles(
                         [{'selector': 'th', 'props': [('font-size', '17px')]}]
                     )
-
                     st.dataframe(styled_df, use_container_width=True)
+                    st.caption("💡 Perfis 'Pronto para Entrevista' são os mais compatíveis com a vaga.")
 
-            except Exception as e:
-                st.error(f"🚨 Erro ao processar requisição: {str(e)}")
+        except Exception as e:
+            st.session_state.carregando = False
+            st.session_state.executou_requisicao = False
+            resultado_container.error(f"🚨 Erro ao processar requisição: {str(e)}")
+
     else:
-        st.markdown("### 🔎 Aguardando envio do formulário...")
-        st.image(
-            "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExeGowcDNpcmRyMWl1aWxidnZ0OXB6bWMzc29kMW4ycDNmNTcyeGt1NiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ZmHLGowrbwbao/giphy.gif",
-            width=350
-        )
+        with resultado_container:
+            st.markdown("### 🤖 Pronto para Analisar os Candidatos")
+            st.info("Carregue os currículos ou JSON, selecione a vaga e clique em **Obter Resultado** para iniciar.")
+            st.image("https://media.giphy.com/media/kfW2zFeA3FQ8YQ4FaA/giphy.gif", width=300)
+
+
+
+
+
+
+
 
