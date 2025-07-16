@@ -23,7 +23,7 @@ if "candidatos_extraidos" not in st.session_state:
 
 # ---------------- SIDEBAR ----------------
 with st.sidebar:
-    st.subheader("📄 Currículos (.pdf ou .docx)")
+    st.subheader("📄 Importar Currículo(s) (.pdf ou .docx)")
     uploaded_cvs = st.file_uploader("Selecionar arquivos", type=["pdf", "docx"], accept_multiple_files=True)
 
     if st.button("📥 Processar Currículos Automaticamente"):
@@ -53,7 +53,7 @@ with st.sidebar:
 
     st.markdown("---")
 
-    st.subheader("📁 Carregar Dados Automáticos (Arquivo JSON)")
+    st.subheader("📁 Importar Currículo(s) em Lote (JSON) ")
     uploaded_json = st.file_uploader("Arquivo JSON", type="json")
     if uploaded_json:
         try:
