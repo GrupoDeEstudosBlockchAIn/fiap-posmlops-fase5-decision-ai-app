@@ -2,15 +2,7 @@
 
 Este aplicativo foi desenvolvido como parte do projeto **Decision AI**, uma plataforma de inteligência artificial que analisa o nível de compatibilidade entre candidatos e vagas de emprego com base em currículo, área de atuação e nível de inglês.
 
-Este front-end interativo foi construído com **Streamlit** e está hospedado gratuitamente na plataforma **Hugging Face Spaces**.
-
----
-
-## 🚀 Demonstração
-
-Acesse a interface diretamente pelo link abaixo:
-
-👉 [https://huggingface.co/spaces/cittamap/decision-ai-app](https://huggingface.co/spaces/cittamap/decision-ai-app)
+Este front-end interativo foi construído com **Streamlit** e está hospedado gratuitamente na plataforma **Streamlit.io**.
 
 ---
 
